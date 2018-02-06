@@ -1,0 +1,117 @@
+{
+  "variables": {
+    "vm_name": "pfsense_vbox",
+    "cpu": "2",
+    "guest_os_type": "FreeBSD_64",
+    "ram_size": "2048",
+    "disk_size": "8192",
+    "post_shutdown_delay": "1m",
+    "export_product": "pfSense",
+    "export_producturl": "https://www.pfsense.org",
+    "export_vendor": "@FoxBoxsnet",
+    "export_vendorurl": "https://github.com/FoxBoxsnet",
+    "export_version": "2.4.2",
+    "export_repository": "https://github.com/FoxBoxsnet/packer-pfSense",
+    "http_directory": "./files/http/pfsense/single",
+    "interface_mgmt_bridgeadapter": "vboxnet0",
+    "iso_checksum_type": "sha256",
+    "iso_checksum": "3fa30cac9b8519e89a176ca8845a5a9536af0e11226f2ec9bcaf85ebcab40416",
+    "iso_url": "./ISO/pfSense-CE-2.4.2-RELEASE-amd64.iso",
+    "ssh_host": "192.168.1.1",
+    "ssh_username": "vagrant",
+    "ssh_password": "vagrant"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "vm_name": "{{user `vm_name`}}",
+      "format": "ova",
+      "guest_os_type": "{{user `guest_os_type`}}",
+      "headless": true,
+      "boot_wait": "30s",
+      "boot_command": [
+        "A",   "<enter>", "<wait>",
+        "I",   "<enter>", "<wait>",
+        "O",   "<enter>", "<wait>",
+        "S",   "<enter>", "<wait>",
+        "O",   "<enter>", "<wait>", "<wait10><wait10><wait10><wait10>",
+        "N",   "<enter>", "<wait>",
+        "R",   "<enter>", "<wait>", "<wait10><wait10><wait10><wait10><wait10><wait10><wait10><wait10><wait10>",
+
+
+        "8",                               "<enter>", "<wait>",
+        "pkg update",                      "<wait>", "<enter>", "<wait10>",
+        "pkg install -y pfSense-pkg-sudo", "<wait>", "<enter>", "<wait10><wait10>",
+
+        "cp /conf/config.xml /conf/config.xml.org", "<enter>", "<wait>",
+        "curl -sfSL {{ .HTTPIP }}:{{ .HTTPPort }}/config.xml -o /conf/config.xml", "<enter>", "<wait5>",
+        "echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /usr/local/etc/sudoers", "<enter>", "<wait>",
+        "reboot", "<enter>", "<wait10><wait10><wait10><wait10><wait10><wait10><wait10><wait10>"
+
+
+      ],
+      "export_opts": [
+        "--manifest",
+        "--vsys",        "0",
+        "--product",     "{{user `export_product`}}",
+        "--producturl",  "{{user `export_producturl`}}",
+        "--vendor",      "{{user `export_vendor`}}",
+        "--vendorurl",   "{{user `export_vendorurl`}}",
+        "--version",     "{{user `export_version`}}",
+        "--description", "Product:                   {{user `export_product`}} <{{user `export_producturl`}}>\nVersion:                   {{user `export_version`}}\n\nVendor:                    {{user `export_vendor`}} <{{user `export_vendorurl`}}>\n\nVagrant username:          {{user `ssh_username`}}\nVagrant password:          {{user `ssh_password`}}\n\nRepository:                {{user `export_repository`}}\n\nCPU:                       {{user `cpu`}} Core\nMemory:                    {{user `ram_size`}} MB\nDISK Size:                 {{user `disk_size`}} MB\n\nInterface WAN:             NAT\nInterface MGMT:            {{user `interface_mamt_bridgeadapter`}}\n"
+      ],
+      "floppy_files": [
+      ],
+      "floppy_dirs": [
+      ],
+      "sata_port_count": 1,
+      "hard_drive_interface": "sata",
+      "disk_size": "{{user `disk_size`}}",
+      "hard_drive_discard": false,
+      "hard_drive_nonrotational": false,
+      "iso_interface": "sata",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_target_extension": "iso",
+      "iso_url": "{{user `iso_url`}}",
+      "guest_additions_mode": "disable",
+      "http_directory": "{{user `http_directory`}}",
+      "http_port_min": "8100",
+      "http_port_max": "9000",
+      "output_directory": "output-{{isotime `2006-01-02/150405 MST`}}",
+      "shutdown_command": "sudo shutdown -p now",
+      "post_shutdown_delay": "{{user `post_shutdown_delay`}}",
+      "shutdown_timeout": "10m",
+      "communicator": "ssh",
+      "ssh_host": "{{user `ssh_host`}}",
+      "ssh_port": 22,
+      "ssh_file_transfer_method": "sftp",
+      "ssh_timeout": "4h",
+      "ssh_username": "{{user `ssh_username`}}",
+      "ssh_password": "{{user `ssh_password`}}",
+      "ssh_skip_nat_mapping": true,
+      "vboxmanage": [
+        [ "modifyvm", "{{.Name}}", "--memory",           "{{user `ram_size`}}" ],
+        [ "modifyvm", "{{.Name}}", "--rtcuseutc",        "on"                  ],
+        [ "modifyvm", "{{.Name}}", "--paravirtprovider", "kvm"                 ],
+        [ "modifyvm", "{{.Name}}", "--vrde",             "on"                  ],
+        [ "modifyvm", "{{.Name}}", "--cpus",             "{{user `cpu`}}"      ],
+        [ "modifyvm", "{{.Name}}", "--audio",            "none"                ],
+        [ "modifyvm", "{{.Name}}", "--pae",              "off"                 ],
+
+
+        [ "modifyvm", "{{.Name}}", "--nic1",             "nat"                 ],
+        [ "modifyvm", "{{.Name}}", "--nicpromisc1",      "allow-all"           ],
+        [ "modifyvm", "{{.Name}}", "--cableconnected1",  "on"                  ],
+
+        [ "modifyvm", "{{.Name}}", "--nic2",             "hostonly"            ],
+        [ "modifyvm", "{{.Name}}", "--nicpromisc2",      "allow-all"           ],
+        [ "modifyvm", "{{.Name}}", "--cableconnected2",  "on"                  ],
+        [ "modifyvm", "{{.Name}}", "--hostonlyadapter2",  "{{user `interface_mgmt_bridgeadapter`}}" ]
+
+      ],
+      "virtualbox_version_file": ".vbox_version",
+      "vrdp_bind_address": "127.0.0.1"
+    }
+  ]
+}
