@@ -1,4 +1,4 @@
-# pfSense packer box
+# pfSense packer OVA
 pfSense OVA file creation VirtualBox with Packer
 
 # Download ISO manually
