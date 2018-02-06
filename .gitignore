@@ -1,0 +1,4 @@
+.DS_Store
+ISO/*.iso
+output-*/
+packer_cache/
