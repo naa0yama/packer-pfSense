@@ -21,7 +21,8 @@
     "iso_url": "./ISO/pfSense-CE-2.4.2-RELEASE-amd64.iso",
     "ssh_host": "10.200.10.1",
     "ssh_username": "vagrant",
-    "ssh_password": "vagrant"
+    "ssh_password": "vagrant",
+    "virtualbox_version": "5.2.6"
   },
   "builders": [
     {
@@ -58,7 +59,7 @@
         "--vendor",      "{{user `export_vendor`}}",
         "--vendorurl",   "{{user `export_vendorurl`}}",
         "--version",     "{{user `export_version`}}",
-        "--description", "Product:                   {{user `export_product`}} <{{user `export_producturl`}}>\nVersion:                   {{user `export_version`}}\n\nVendor:                    {{user `export_vendor`}} <{{user `export_vendorurl`}}>\n\nVagrant username:          {{user `ssh_username`}}\nVagrant password:          {{user `ssh_password`}}\n\nRepository:                {{user `export_repository`}}\n\nCPU:                       {{user `cpu`}} Core\nMemory:                    {{user `ram_size`}} MB\nDISK Size:                 {{user `disk_size`}} MB\n\nInterface WAN:             NAT\nInterface MGMT:            {{user `interface_mamt_bridgeadapter`}}\nInterface USER:            {{user `interface_user_bridgeadapter`}}\nInterface NAT64:           {{user `interface_nat64_bridgeadapter`}}\n"
+        "--description", "Product:\t\t{{user `export_product`}} <{{user `export_producturl`}}>\nVersion:\t\t{{user `export_version`}}\n\nVendor:\t\t{{user `export_vendor`}} <{{user `export_vendorurl`}}>\n\nVagrant username:\t{{user `ssh_username`}}\nVagrant password:\t{{user `ssh_password`}}\n\nRepository:\t\t{{user `export_repository`}}\n\nCPU:\t\t{{user `cpu`}} Core\nMemory:\t\t{{user `ram_size`}} MB\nDISK Size:\t\t{{user `disk_size`}} MB\n\nInterface WAN:\tNAT\nInterface MGMT:\t{{user `interface_mamt_bridgeadapter`}}\nInterface USER:\t{{user `interface_user_bridgeadapter`}}\nInterface NAT64:\t{{user `interface_nat64_bridgeadapter`}}\n\nPackage version:\t{{packer_version}}\nVirtualBox version:\t{{user `virtualbox_version`}}\nBuild time\t\t{{isotime `2006-01-02/150405 MST`}}"
       ],
       "floppy_files": [
       ],
